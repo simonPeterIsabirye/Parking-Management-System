@@ -1,23 +1,38 @@
 import Database from "better-sqlite3";
 import path from "path";
+import fs from "fs";
 
 // -------------------------
-// Environment Configuration
+// Environment Detection
 // -------------------------
 const isProduction = process.env.NODE_ENV === "production";
 
-// Use persistent storage in production (e.g. Render / VPS)
-const dbPath = isProduction
-  ? "/data/parkease.db"
-  : path.resolve("parkease.db");
+// -------------------------
+// Safe Database Path Strategy
+// -------------------------
+// IMPORTANT:
+// - Render free tier: no guaranteed /data disk
+// - Local dev: use project directory
+// - Production fallback: project directory (safe default)
+
+const baseDir = isProduction
+  ? path.join(process.cwd(), "data") // safe fallback for Render free tier
+  : path.join(process.cwd(), "data");
+
+// Ensure directory exists BEFORE opening DB
+fs.mkdirSync(baseDir, { recursive: true });
+
+// Final DB file path
+const dbPath = path.join(baseDir, "parkease.db");
 
 // -------------------------
-// Database Connection
+// Initialize Database
 // -------------------------
+// NOTE: This runs ONLY on server runtime (see below fix in pages)
 const db = new Database(dbPath);
 
 // -------------------------
-// Initialize Tables
+// Initialize Tables (idempotent)
 // -------------------------
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
@@ -100,6 +115,6 @@ db.exec(`
 `);
 
 // -------------------------
-// Export Database Instance
+// Export DB (IMPORTANT: server-only usage)
 // -------------------------
 export default db;

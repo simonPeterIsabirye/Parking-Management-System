@@ -1,10 +1,24 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import Database from "better-sqlite3";
+import path from "path";
 
-const dbPath = path.resolve('parkease.db');
+// -------------------------
+// Environment Configuration
+// -------------------------
+const isProduction = process.env.NODE_ENV === "production";
+
+// Use persistent storage in production (e.g. Render / VPS)
+const dbPath = isProduction
+  ? "/data/parkease.db"
+  : path.resolve("parkease.db");
+
+// -------------------------
+// Database Connection
+// -------------------------
 const db = new Database(dbPath);
 
+// -------------------------
 // Initialize Tables
+// -------------------------
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,10 +38,10 @@ db.exec(`
     nin_number TEXT,
     is_signed_out BOOLEAN DEFAULT 0,
     registered_by INTEGER,
-    parking_type TEXT DEFAULT 'hourly', -- 'hourly' or 'daily'
-    FOREIGN KEY(registered_by) REFERENCES users(id)
+    parking_type TEXT DEFAULT 'hourly',
+    FOREIGN KEY (registered_by) REFERENCES users(id)
   );
-  
+
   CREATE TABLE IF NOT EXISTS parking_transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     receipt_number TEXT UNIQUE NOT NULL,
@@ -35,9 +49,9 @@ db.exec(`
     amount REAL NOT NULL,
     pricing_band TEXT,
     duration_minutes INTEGER,
-    FOREIGN KEY(vehicle_id) REFERENCES vehicle_entries(id)
+    FOREIGN KEY (vehicle_id) REFERENCES vehicle_entries(id)
   );
-  
+
   CREATE TABLE IF NOT EXISTS vehicle_sign_outs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     vehicle_id INTEGER NOT NULL UNIQUE,
@@ -48,8 +62,8 @@ db.exec(`
     gender TEXT,
     nin_number TEXT,
     processed_by INTEGER,
-    FOREIGN KEY(vehicle_id) REFERENCES vehicle_entries(id),
-    FOREIGN KEY(processed_by) REFERENCES users(id)
+    FOREIGN KEY (vehicle_id) REFERENCES vehicle_entries(id),
+    FOREIGN KEY (processed_by) REFERENCES users(id)
   );
 
   CREATE TABLE IF NOT EXISTS service_prices (
@@ -59,7 +73,7 @@ db.exec(`
     price REAL NOT NULL,
     configured_by INTEGER,
     UNIQUE(section, item_name),
-    FOREIGN KEY(configured_by) REFERENCES users(id)
+    FOREIGN KEY (configured_by) REFERENCES users(id)
   );
 
   CREATE TABLE IF NOT EXISTS tyre_service_transactions (
@@ -70,7 +84,7 @@ db.exec(`
     service_type TEXT,
     amount REAL NOT NULL,
     handled_by INTEGER,
-    FOREIGN KEY(handled_by) REFERENCES users(id)
+    FOREIGN KEY (handled_by) REFERENCES users(id)
   );
 
   CREATE TABLE IF NOT EXISTS battery_transactions (
@@ -81,8 +95,11 @@ db.exec(`
     transaction_type TEXT,
     amount REAL NOT NULL,
     handled_by INTEGER,
-    FOREIGN KEY(handled_by) REFERENCES users(id)
+    FOREIGN KEY (handled_by) REFERENCES users(id)
   );
 `);
 
+// -------------------------
+// Export Database Instance
+// -------------------------
 export default db;

@@ -1,0 +1,6 @@
+{
+  "name": "ParkEase",
+  "description": "A vehicle parking, tyre clinic, and battery management system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

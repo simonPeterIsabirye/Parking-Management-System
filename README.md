@@ -1,11 +1,28 @@
-<div align="center">
+# ParkEase
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+ParkEase is a comprehensive parking, tyre clinic, and battery management system designed for parking attendants and service managers.
 
-  <h1>Built with AI Studio</h2>
+## Features
+- **Parking Management**: Register vehicle arrivals, track parking transactions, and sign out vehicles.
+- **Service Management**: Record transactions for tyre services and battery hires/sales.
+- **Reporting**: Generate daily revenue reports and monitor overall system activity.
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## Getting Started
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+1. **Prerequisites**: Ensure you have Node.js and an active AI Studio development environment.
+2. **Environment Setup**:
+   - The project uses Next.js 15+ with Tailwind CSS for styling.
+   - Database: SQLite (via `better-sqlite3`).
+3. **Execution**:
+   - Run `npm install`.
+   - Run `npm run dev` to start the development server on port 3000.
 
-</div>
+## Database Structure
+
+The project uses SQLite for local storage. Ensure `parkease.db` is initialized on startup.
+- `users`: Authentication data.
+- `vehicle_entries`: Stores tracked vehicle records.
+
+## Security & Maintenance
+- All user input is sanitized before database insertion (using parameterized queries).
+- Ensure valid input for fields like 'number_plate'.
